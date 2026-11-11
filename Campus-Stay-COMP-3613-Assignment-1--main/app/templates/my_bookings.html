@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}My bookings{% endblock %}
+{% block content %}
+<h1>My bookings</h1>
+{% if rows %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Ref</th><th>Place</th><th>Dates</th><th>Status</th><th>Landlord note</th><th></th></tr></thead>
+  <tbody>
+  {% for row in rows %}
+    {% set b = row.booking %}
+    <tr>
+      <td class="small">#{{ b.reference }}</td>
+      <td><a href="/accommodations/{{ b.accommodation.id }}">{{ b.accommodation.title }}</a><br><span class="muted small">{{ b.accommodation.rent | ttd }} / month</span></td>
+      <td>{{ b.start_date | fmt_date }} → {{ b.end_date | fmt_date }}<br><span class="muted small">{{ b.nights }} days · {{ b.occupants }} occupant{{ '' if b.occupants == 1 else 's' }}</span></td>
+      <td>{{ status_badge(b.display_status) }}</td>
+      <td class="small">{{ b.landlord_note or '—' }}</td>
+      <td class="actions">
+        {% if row.can_review %}<a class="btn btn-primary btn-sm" href="/bookings/{{ b.id }}/review">Write review</a>{% endif %}
+        {% if row.reviewed %}<span class="muted small">Reviewed ✓</span>{% endif %}
+        {% if row.can_cancel %}
+          <form method="post" action="/bookings/{{ b.id }}/cancel" onsubmit="return confirm('Cancel this booking?')">
+            <button class="btn btn-ghost btn-sm" type="submit">Cancel</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  <div class="card empty">No bookings yet. <a href="/accommodations">Find a place</a> and send your first request.</div>
+{% endif %}
+{% endblock %}

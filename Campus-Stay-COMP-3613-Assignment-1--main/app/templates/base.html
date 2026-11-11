@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Campus Stay{% endblock %} · Campus Stay</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="wordmark" href="/">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-8.5Z" fill="currentColor"/></svg>
+      Campus<span>_</span>Stay
+    </a>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/accommodations">Find Accommodation</a>
+      {% if user and user.role == 'student' %}
+        <a href="/my/bookings">My Bookings</a>
+      {% elif user and user.role == 'landlord' %}
+        <a href="/landlord">Dashboard</a>
+        <a href="/landlord/accommodations/new">Post accommodation</a>
+      {% elif user and user.role == 'admin' %}
+        <a href="/admin">Verification</a>
+      {% endif %}
+    </nav>
+    <div class="nav-auth">
+      {% if user %}
+        <span class="who">{{ user.full_name or user.username }} <em class="role">{{ user.role }}</em></span>
+        <form method="post" action="/logout"><button class="btn btn-ghost btn-sm" type="submit">Log out</button></form>
+      {% else %}
+        <a class="btn btn-ghost btn-sm" href="/login">Log in</a>
+        <a class="btn btn-primary btn-sm" href="/register">Sign up</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  {% for f in flashes %}
+    <div class="flash flash-{{ f.category }}" role="status">{{ f.message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container">Campus Stay · trusted student accommodation near UWI St. Augustine</div>
+</footer>
+</body>
+</html>

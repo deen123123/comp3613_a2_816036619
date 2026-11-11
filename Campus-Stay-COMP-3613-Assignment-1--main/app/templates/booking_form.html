@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Request booking{% endblock %}
+{% block content %}
+<p class="muted small"><a href="/accommodations">Find Accommodation</a> › <a href="/accommodations/{{ accommodation.id }}">{{ accommodation.title }}</a> › Request booking</p>
+<div class="auth-card card wide">
+  <h1>Request Accommodation Booking</h1>
+  <div class="summary">
+    <strong>{{ accommodation.title }}</strong>
+    <span class="muted">{{ accommodation.address }}</span>
+    <span class="price">{{ accommodation.rent | ttd }} <small>/ month</small></span>
+  </div>
+  <form method="post" action="/accommodations/{{ accommodation.id }}/book" class="form">
+    <div class="two">
+      <label>Move-in date <input type="date" name="start_date" min="{{ today().isoformat() }}" value="{{ form.start_date or '' }}" required></label>
+      <label>Move-out date <input type="date" name="end_date" min="{{ today().isoformat() }}" value="{{ form.end_date or '' }}" required></label>
+    </div>
+    <label>Occupants <input type="number" name="occupants" min="1" max="{{ accommodation.max_tenants }}" value="{{ form.occupants or 1 }}" required></label>
+    <label>Message to landlord <textarea name="message" rows="4" maxlength="500" placeholder="Tell them a bit about yourself">{{ form.message or '' }}</textarea></label>
+    <p class="muted small">Minimum stay 28 days. Your request stays pending until the landlord approves it.</p>
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">Submit Booking Request</button>
+      <a class="btn btn-ghost" href="/accommodations/{{ accommodation.id }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

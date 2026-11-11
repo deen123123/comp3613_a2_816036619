@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit accommodation' if accommodation else 'Post a place' }}{% endblock %}
+{% block content %}
+<div class="auth-card card wide">
+  <h1>{{ 'Edit accommodation' if accommodation else 'Post a place' }}</h1>
+  <form method="post" class="form">
+    <label>Title <input name="title" value="{{ form.title or '' }}" maxlength="150" required></label>
+    <label>Description <textarea name="description" rows="5" maxlength="4000" required>{{ form.description or '' }}</textarea></label>
+    <div class="two">
+      <label>Area <input name="area" value="{{ form.area or '' }}" placeholder="e.g. Curepe" required></label>
+      <label>Address <input name="address" value="{{ form.address or '' }}" required></label>
+    </div>
+    <div class="two">
+      <label>Type
+        <select name="room_type">
+          {% for key, label in room_types.items() %}<option value="{{ key }}" {{ 'selected' if form.room_type == key }}>{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Monthly price (TT$) <input type="number" name="rent" min="1" value="{{ form.rent or '' }}" required></label>
+    </div>
+    <div class="two">
+      <label>Bedrooms <input type="number" name="bedrooms" min="1" max="10" value="{{ form.bedrooms or 1 }}" required></label>
+      <label>Sleeps <input type="number" name="max_tenants" min="1" max="12" value="{{ form.max_tenants or 1 }}" required></label>
+    </div>
+    <div class="two">
+      <label>Distance to campus (km) <input type="number" step="0.1" min="0" name="distance_km" value="{{ form.distance_km or '' }}" required></label>
+      <label>Available from <input type="date" name="available_from" value="{{ form.available_from or '' }}"></label>
+    </div>
+    <label>Photo URL (optional) <input type="url" name="image_url" value="{{ form.image_url or '' }}" placeholder="https://…"></label>
+    <fieldset>
+      <legend>Amenities</legend>
+      <div class="check-grid">
+        {% for key, label in amenity_labels.items() %}
+          <label class="check"><input type="checkbox" name="amenities" value="{{ key }}" {{ 'checked' if key in (form.amenities or []) }}> {{ label }}</label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <p class="muted small">New and changed places are reviewed by an admin before students can see them.</p>
+    <button class="btn btn-primary" type="submit">{{ 'Save changes' if accommodation else 'Submit for verification' }}</button>
+    <a class="btn btn-ghost" href="/landlord">Cancel</a>
+  </form>
+</div>
+{% endblock %}

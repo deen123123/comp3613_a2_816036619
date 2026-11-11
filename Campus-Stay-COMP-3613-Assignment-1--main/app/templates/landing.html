@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import accommodation_card %}
+{% block title %}Find your place{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Find a trusted place to stay near campus.</h1>
+  <p>Every accommodation is checked by our team and every review comes from a student who actually lived there.</p>
+  <form class="hero-search" action="/accommodations" method="get">
+    <input type="search" name="location" placeholder="Enter city, area or university, e.g. Curepe" aria-label="Location">
+    <button class="btn btn-primary" type="submit">Search</button>
+  </form>
+  {% if not user %}
+    <p class="hero-sub">Landlord with a room to rent? <a href="/register">Create a landlord account</a>.</p>
+  {% endif %}
+</section>
+
+<section class="steps">
+  <div><strong>1 · Search</strong><p>Search by location, then refine by rent, bedrooms and availability.</p></div>
+  <div><strong>2 · View &amp; compare reviews</strong><p>Read the details and what past students said before you decide.</p></div>
+  <div><strong>3 · Request a booking</strong><p>Pick your dates and send a request. The landlord approves it and you track it in My Bookings.</p></div>
+</section>
+
+<section>
+  <div class="row-between"><h2>Closest to campus</h2><a href="/accommodations">See all accommodations →</a></div>
+  <div class="grid">
+    {% for card in featured %}{{ accommodation_card(card) }}{% else %}<p class="muted">No accommodations yet.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

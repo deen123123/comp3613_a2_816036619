@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Booking request submitted{% endblock %}
+{% block content %}
+<div class="auth-card card wide center">
+  <h1>Booking Request Submitted</h1>
+  <p><strong>Success!</strong> Your request has been sent to the landlord.</p>
+  <div class="summary confirm">
+    <strong>{{ booking.accommodation.title }}</strong>
+    <span>{{ booking.start_date | fmt_date }} → {{ booking.end_date | fmt_date }} · {{ booking.occupants }} occupant{{ '' if booking.occupants == 1 else 's' }}</span>
+    <span>Ref: <strong>#{{ booking.reference }}</strong></span>
+    <span>Status: {{ status_badge(booking.status) }} <span class="muted small">(awaiting landlord approval)</span></span>
+  </div>
+  <div class="actions" style="justify-content:center">
+    <a class="btn btn-primary" href="/my/bookings">View My Bookings</a>
+    <a class="btn btn-ghost" href="/accommodations">Return to Search</a>
+  </div>
+</div>
+{% endblock %}
