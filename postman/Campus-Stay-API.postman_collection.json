@@ -1,0 +1,176 @@
+{
+  "info": {
+    "_postman_id": "b7d54d8e-1403-4f4a-9c0f-779e10580d72",
+    "name": "Campus Stay API Tests",
+    "description": "Smoke and filter tests for the Campus Stay health and accommodation search endpoints. Start the app and seed its database before running this collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns HTTP 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('reports healthy service', function () {",
+              "    pm.expect(pm.response.json()).to.eql({ status: 'ok' });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List verified accommodation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accommodations"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns HTTP 200 and a JSON array', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(pm.response.json()).to.be.an('array');",
+              "});",
+              "pm.test('each listing exposes the documented card fields', function () {",
+              "    const rows = pm.response.json();",
+              "    const required = ['id', 'title', 'area', 'address', 'rent', 'bedrooms', 'availability_status', 'is_verified', 'avg_rating', 'review_count'];",
+              "    rows.forEach(function (row) {",
+              "        required.forEach(function (key) { pm.expect(row).to.have.property(key); });",
+              "        pm.expect(row.is_verified).to.eql(true);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter by location and rent",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?location=Arima&min_rent=800&max_rent=1000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accommodations"],
+          "query": [
+            {"key": "location", "value": "Arima"},
+            {"key": "min_rent", "value": "800"},
+            {"key": "max_rent", "value": "1000"}
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns only matching Arima listings within the rent range', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const rows = pm.response.json();",
+              "    pm.expect(rows.length).to.be.greaterThan(0);",
+              "    rows.forEach(function (row) {",
+              "        pm.expect((row.area + ' ' + row.address + ' ' + row.title).toLowerCase()).to.include('arima');",
+              "        pm.expect(row.rent).to.be.within(800, 1000);",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filter for available now",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?available_now=1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accommodations"],
+          "query": [
+            {"key": "available_now", "value": "1"}
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns only currently available listings', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.response.json().forEach(function (row) {",
+              "        pm.expect(row.availability_status).to.eql('Available');",
+              "        pm.expect(row.title).not.to.include('Trincity');",
+              "    });",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unverified listing is not public",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?location=Valsayn",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accommodations"],
+          "query": [
+            {"key": "location", "value": "Valsayn"}
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('does not expose unverified accommodation', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(pm.response.json()).to.be.an('array').that.is.empty;",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
